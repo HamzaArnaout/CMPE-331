@@ -60,4 +60,9 @@ public class InputManager : MonoBehaviour
     {
         return playerControls.Player.Interact.triggered;
     }
+
+    public bool PlayerShotThisFrame()
+    {
+        return playerControls.Player.Shoot.triggered;
+    }
 }

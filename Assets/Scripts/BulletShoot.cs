@@ -7,10 +7,11 @@ public class BulletShoot : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform firePoint;
     public float bulletSpeed = 1000f; // Mermi hızı, bu değeri ihtiyacınıza göre ayarlayabilirsiniz
+    public InputManager inputManager;
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (inputManager.PlayerShotThisFrame())
         {
             FireBullet();
         }
@@ -24,5 +25,13 @@ public class BulletShoot : MonoBehaviour
         {
             rb.AddForce(firePoint.forward * bulletSpeed);
         }
+
+        StartCoroutine(DeleteBullet(bullet));
+    }
+
+    IEnumerator DeleteBullet(GameObject bullet)
+    {
+        yield return new WaitForSeconds(2f);
+        Destroy(bullet);
     }
 }

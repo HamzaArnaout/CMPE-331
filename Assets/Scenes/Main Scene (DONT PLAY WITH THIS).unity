@@ -12401,8 +12401,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c790b725c9b5f1841bf218822322e35b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalSpeed: 200
-  verticalSpeed: 200
+  horizontalSpeed: 20
+  verticalSpeed: 20
   clampAngle: 80
   inputManager: {fileID: 602150274}
 --- !u!1 &1785823730
@@ -13049,7 +13049,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  speed: 2
+  speed: 4
   jumpingPower: 5
   inputManager: {fileID: 602150274}
 --- !u!114 &1866907725
