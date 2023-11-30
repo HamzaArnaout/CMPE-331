@@ -5,57 +5,68 @@ using TMPro;
 
 public class BulletShoot : MonoBehaviour
 {
-    // Define the bullet prefab to be instantiated
+    // References to the bullet prefab and the firing point
     public GameObject bulletPrefab;
-    // The transform from which bullets will be fired
     public Transform firePoint;
-    // Speed of the bullet
+    // Bullet speed
     public float bulletSpeed = 1000f;
 
-    // Text element to display bullet count
+    // Text element to display the bullet count
     public TextMeshProUGUI bulletText;
-    // Initial bullet count
+    // Number of bullets currently ready to fire
     private int bulletCount = 30;
+    // Total number of bullets available in the inventory
+    private int bulletInventoryCount = 120;
 
     void Update()
     {
-        // Check if left mouse button is clicked and if there are bullets left
+        // Check if the left mouse button is clicked and there are bullets to fire
         if (Input.GetMouseButtonDown(0) && bulletCount > 0)
         {
             // Fire a bullet
             FireBullet();
-            // Decrement the bullet count
+            // Decrease the count of ready bullets
             bulletCount--;
             // Update the bullet count display
             UpdateBulletText();
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && bulletCount == 0)
+        // Check if the 'R' key is pressed and there are bullets in the inventory
+        if (Input.GetKeyDown(KeyCode.R) && bulletInventoryCount > 0)
         {
-            // Reset the bullet count to 30
-            bulletCount = 30;
+            // Calculate how many bullets are needed to refill the magazine to full
+            int neededBullets = 30 - bulletCount;
+            // Determine how many bullets can be reloaded from the inventory
+            int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
+            // Decrease the inventory count by the number of bullets reloaded
+            bulletInventoryCount -= bulletsToReload;
+            // Increase the ready bullet count by the number of bullets reloaded
+            bulletCount += bulletsToReload;
             // Update the bullet count display
             UpdateBulletText();
         }
     }
 
-    // Update the bullet count text on the UI
+    // Updates the text display showing the number of bullets
     void UpdateBulletText()
     {
-        bulletText.text = bulletCount.ToString();
+        // Show the inventory count and the ready bullet count
+        bulletText.text = bulletInventoryCount + "/" + bulletCount.ToString();
     }
 
-    // Method to fire a bullet
+    // Function to handle the firing of a bullet
     void FireBullet()
     {
         // Create a bullet instance at the fire point's position and rotation
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        // Get the Rigidbody component of the bullet for physics
+        // Get the Rigidbody component for applying physics
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // Apply force to the bullet to propel it forward
+            // Apply a force to the bullet to propel it forward
             rb.AddForce(firePoint.forward * bulletSpeed);
         }
+        // Destroy the bullet after 5 seconds
+        Destroy(bullet, 5.0f);
     }
 }
