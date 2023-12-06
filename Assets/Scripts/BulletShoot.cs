@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class BulletShoot : MonoBehaviour
 {
@@ -14,11 +15,13 @@ public class BulletShoot : MonoBehaviour
     // Text element to display the bullet count
     public TextMeshProUGUI bulletText;
     // Number of bullets currently ready to fire
-    private int bulletCount = 30;
+    [SerializeField] private int bulletCount = 12;
     // Total number of bullets available in the inventory
-    [SerializeField] private int bulletInventoryCount = 120;
+    [SerializeField] private int bulletInventoryCount = 48;
 
     [SerializeField] InputManager inputManager;
+    [SerializeField] ParticleSystem muzzleFlashParticle;
+    [SerializeField] Light muzzleFlashLight;
 
     void Update()
     {
@@ -37,7 +40,7 @@ public class BulletShoot : MonoBehaviour
         if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0)
         {
             // Calculate how many bullets are needed to refill the magazine to full
-            int neededBullets = 30 - bulletCount;
+            int neededBullets = 12 - bulletCount;
             // Determine how many bullets can be reloaded from the inventory
             int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
             // Decrease the inventory count by the number of bullets reloaded
@@ -67,7 +70,16 @@ public class BulletShoot : MonoBehaviour
             // Apply a force to the bullet to propel it forward
             rb.AddForce(firePoint.forward * bulletSpeed);
         }
+        StartCoroutine(MuzzleFlashLight());
+        muzzleFlashParticle.Play();
         // Destroy the bullet after 5 seconds
         Destroy(bullet, 5.0f);
+    }
+
+    IEnumerator MuzzleFlashLight()
+    {
+        muzzleFlashLight.enabled = true;
+        yield return new WaitForSeconds(0.1f);
+        muzzleFlashLight.enabled = false;
     }
 }
