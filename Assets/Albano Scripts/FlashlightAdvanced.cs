@@ -5,90 +5,87 @@ using TMPro;
 
 public class FlashlightAdvanced : MonoBehaviour
 {
-    public Light light;
-    public TMP_Text text;
+    private new Light light;
 
-    public TMP_Text batteryText;
+    [Header("Text elements")]
+    public TMP_Text lifetimeText;
+    [SerializeField] private TMP_Text batteriesAmountText;
 
-    public float lifetime = 100;
+    [Header("Properties")]
+    [SerializeField] private float lifetime;
+    [SerializeField] private float batteriesAmount = 0;
+    [SerializeField] private bool isFlashlightOn;
 
-    public float batteries = 0;
+    [Header("Sound")]
+    [SerializeField] private AudioSource flashON;
+    [SerializeField] private AudioSource flashOFF;
 
-    public AudioSource flashON;
-    public AudioSource flashOFF;
-
-    private bool on;
-    private bool off;
+    [Header("Controls")]
+    public InputManager inputManager;
 
 
     void Start()
     {
         light = GetComponent<Light>();
-
-        off = true;
-        light.enabled = false;
-
     }
-
-
 
     void Update()
     {
-        text.text = lifetime.ToString("0") + "%";
-        batteryText.text = batteries.ToString();
+        // Update the text for lifetime and battery amount respectively
+        lifetimeText.text = lifetime.ToString("0") + "%";
+        batteriesAmountText.text = batteriesAmount.ToString();
 
-        if(Input.GetButtonDown("flashlight") && off)
+
+        // Turning on the flashlight
+        if(inputManager.PlayerActivatedFlashlightThisFrame() && !isFlashlightOn)
         {
-            flashON.Play();
+            //flashON.Play();
             light.enabled = true;
-            on = true;
-            off = false;
+            isFlashlightOn = !isFlashlightOn;
         }
 
-        else if (Input.GetButtonDown("flashlight") && on)
+        // Turning off the flashlight
+        else if (inputManager.PlayerActivatedFlashlightThisFrame() && isFlashlightOn)
         {
-            flashOFF.Play();
+            //flashOFF.Play();
             light.enabled = false;
-            on = false;
-            off = true;
+            isFlashlightOn = !isFlashlightOn;
         }
 
-        if (on)
+        // As long as the flashlight is turned on
+        // lifetime reduces by 1 each second
+        if (isFlashlightOn && lifetime > 0)
         {
             lifetime -= 1 * Time.deltaTime;
         }
 
+        // Cap lifetime from ever going less than 0
+        // and shutting off the flashlight if the
+        // lifetime is equal to 0
         if(lifetime <= 0)
         {
             light.enabled = false;
-            on = false;
-            off = true;
+            isFlashlightOn = false;
             lifetime = 0;
         }
 
+        // Cap lifetime from ever going over 100
         if (lifetime >= 100)
         {
             lifetime = 100;
         }
 
-        if (Input.GetButtonDown("reload") && batteries >= 1)
+        // Reloading batteries makes adds 50 to the lifetime
+        // and it deducts 1 battery from the inventory
+        if (inputManager.PlayerReloadedThisFrame() && batteriesAmount >= 1)
         {
-            batteries -= 1;
+            batteriesAmount -= 1;
             lifetime += 50;
         }
-
-        if (Input.GetButtonDown("reload") && batteries == 0)
-        {
-            return;
-        }
-
-        if(batteries <= 0)
-        {
-            batteries = 0;
-        }
-
-
-
     }
 
+    public void AddBatteries(int amountToAdd)
+    {
+        batteriesAmount += amountToAdd;
+    }
 }

@@ -2,54 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BatteryPickUp : MonoBehaviour
+public class BatteryPickUp : MonoBehaviour, IInteractable
 {
-    private bool inReach;
+    [SerializeField] private FlashlightAdvanced flashlight;
+    [SerializeField] private AudioSource pickUpSound;
 
-    public GameObject pickUpText;
-    private GameObject flashlight;
-
-    public AudioSource pickUpSound;
-
-    void Start()
+    public void Interact()
     {
-        inReach = false;
-        pickUpText.SetActive(false);
-        flashlight = GameObject.Find("flashlight");
+        flashlight.AddBatteries(1);
+        //pickUpSound.Play();
+        Destroy(gameObject);
     }
 
-    void OnTriggerEnter(Collider other)
+    public string SetInteractableText()
     {
-        if (other.gameObject.tag == "Reach")
-        {
-            inReach = true;
-            pickUpText.SetActive(true);
-        }
-
+        return "Pick up (E) the battery";
     }
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "Reach")
-        {
-            inReach = false;
-            pickUpText.SetActive(false);
-        }
-    }
-
-
-
-
-    void Update()
-    {
-        if(Input.GetButtonDown("Interact") && inReach)
-        {
-            flashlight.GetComponent<FlashlightAdvanced>().batteries += 1;
-            pickUpSound.Play();
-            inReach = false;
-            pickUpText.SetActive(false);
-            Destroy(gameObject);
-        }
-        
-    }
 }

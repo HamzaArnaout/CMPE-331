@@ -16,23 +16,25 @@ public class BulletShoot : MonoBehaviour
     // Number of bullets currently ready to fire
     private int bulletCount = 30;
     // Total number of bullets available in the inventory
-    private int bulletInventoryCount = 120;
+    [SerializeField] private int bulletInventoryCount = 120;
+
+    [SerializeField] InputManager inputManager;
 
     void Update()
     {
-        // Check if the left mouse button is clicked and there are bullets to fire
-        if (Input.GetMouseButtonDown(0) && bulletCount > 0)
+        // If the player shoots, and has bullets in the magazine,
+        // we shoot, reduce 1 bullet, and update the text
+        if (inputManager.PlayerShotThisFrame() && bulletCount > 0)
         {
-            // Fire a bullet
             FireBullet();
-            // Decrease the count of ready bullets
             bulletCount--;
-            // Update the bullet count display
             UpdateBulletText();
         }
 
-        // Check if the 'R' key is pressed and there are bullets in the inventory
-        if (Input.GetKeyDown(KeyCode.R) && bulletInventoryCount > 0)
+        // If the player reloads and has bullets in the inventory
+        // We do the math to check the bullets to remove from the inventory
+        // and the bullets to add to the magazine
+        if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0)
         {
             // Calculate how many bullets are needed to refill the magazine to full
             int neededBullets = 30 - bulletCount;
@@ -42,7 +44,6 @@ public class BulletShoot : MonoBehaviour
             bulletInventoryCount -= bulletsToReload;
             // Increase the ready bullet count by the number of bullets reloaded
             bulletCount += bulletsToReload;
-            // Update the bullet count display
             UpdateBulletText();
         }
     }
@@ -51,7 +52,7 @@ public class BulletShoot : MonoBehaviour
     void UpdateBulletText()
     {
         // Show the inventory count and the ready bullet count
-        bulletText.text = bulletInventoryCount + "/" + bulletCount.ToString();
+        bulletText.text = bulletCount.ToString() + "/" +bulletInventoryCount;
     }
 
     // Function to handle the firing of a bullet

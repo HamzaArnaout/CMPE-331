@@ -51,6 +51,11 @@ public class InputManager : MonoBehaviour
         return playerControls.Player.Look.ReadValue<Vector2>();
     }
 
+    public bool PlayerShotThisFrame()
+    {
+        return playerControls.Player.Shoot.triggered;
+    }
+
     public bool PlayerJumpedThisFrame()
     {
         return playerControls.Player.Jump.triggered;
@@ -59,5 +64,15 @@ public class InputManager : MonoBehaviour
     public bool PlayerInteractedThisFrame()
     {
         return playerControls.Player.Interact.triggered;
+    }
+
+    public bool PlayerActivatedFlashlightThisFrame()
+    {
+        return playerControls.Player.Flashlight.triggered;
+    }
+
+    public bool PlayerReloadedThisFrame()
+    {
+        return playerControls.Player.Reload.triggered;
     }
 }

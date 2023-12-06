@@ -16,16 +16,15 @@ interface IInteractable
 
 public class Interactor : MonoBehaviour
 {
-    public Transform interatorSource; // Get the transform of the interactor (player most likely)
+    public Transform interactorSource; // Get the transform of the interactor (player most likely)
     public float interactionRange; // Determines distance between player and interactable
     public TMP_Text interactionText;
-    public bool interacting = false;
     public InputManager inputManager;
-
 
     void Update()
     {
-        Ray r = new Ray(interatorSource.position, interatorSource.forward); // Raycast from player to forward vector
+        Ray r = new Ray(interactorSource.position, interactorSource.forward); // Raycast from player to forward vector
+
         if (Physics.Raycast(r, out RaycastHit hitInfo, interactionRange)) // Shoot raycast and get info
         {
             if (hitInfo.collider.gameObject.TryGetComponent(out IInteractable interactObj))
@@ -41,6 +40,7 @@ public class Interactor : MonoBehaviour
                 interactionText.text = "";
             }
         }
+
     }
 
 }

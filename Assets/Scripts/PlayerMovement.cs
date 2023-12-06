@@ -10,8 +10,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
 
-    private float horizontalX;
-    private float horizontalZ;
     [Header("Movement")]
     public float speed;
     public float jumpingPower;
@@ -38,12 +36,6 @@ public class PlayerMovement : MonoBehaviour
     private bool IsGrounded()
     {
         return Physics.CheckSphere(groundCheck.position, 0.2f, groundLayer);
-    }
-
-    public void Move(InputAction.CallbackContext context)
-    {
-        horizontalX = context.ReadValue<Vector2>().x;
-        horizontalZ = context.ReadValue<Vector2>().y;
     }
 
     public void Jump(InputAction.CallbackContext context)
