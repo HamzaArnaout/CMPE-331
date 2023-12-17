@@ -24,6 +24,7 @@ public class FlashlightAdvanced : MonoBehaviour
 
     [Header("Controls")]
     public InputManager inputManager;
+    public Interactor interactor;
 
 
     void Start()
@@ -40,7 +41,7 @@ public class FlashlightAdvanced : MonoBehaviour
 
 
         // Turning on the flashlight
-        if (inputManager.PlayerActivatedFlashlightThisFrame() && !isFlashlightOn)
+        if (inputManager.PlayerActivatedFlashlightThisFrame() && !isFlashlightOn && interactor.canInteract)
         {
             //flashON.Play();
             light.enabled = true;
@@ -48,7 +49,7 @@ public class FlashlightAdvanced : MonoBehaviour
         }
 
         // Turning off the flashlight
-        else if (inputManager.PlayerActivatedFlashlightThisFrame() && isFlashlightOn)
+        else if (inputManager.PlayerActivatedFlashlightThisFrame() && isFlashlightOn && interactor.canInteract)
         {
             //flashOFF.Play();
             light.enabled = false;
@@ -80,7 +81,7 @@ public class FlashlightAdvanced : MonoBehaviour
 
         // Reloading batteries makes adds 50 to the lifetime
         // and it deducts 1 battery from the inventory
-        if (inputManager.PlayerReloadedThisFrame() && batteriesAmount >= 1)
+        if (inputManager.PlayerReloadedThisFrame() && batteriesAmount >= 1 && interactor.canInteract)
         {
             batteriesAmount -= 1;
             lifetime += 100;

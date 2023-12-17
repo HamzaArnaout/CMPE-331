@@ -17,6 +17,7 @@ public class Interactor : MonoBehaviour
     public TMP_Text interactionText;
     public InputManager inputManager;
 
+    public bool canInteract = true;
     void Update()
     {
         Ray r = new Ray(interactorSource.position, interactorSource.forward); // Raycast from player to forward vector
@@ -26,7 +27,7 @@ public class Interactor : MonoBehaviour
             if (hitInfo.collider.gameObject.TryGetComponent(out IInteractable interactObj))
             {
                 interactionText.text = interactObj.SetInteractableText();
-                if (inputManager.PlayerInteractedThisFrame())
+                if (inputManager.PlayerInteractedThisFrame() && canInteract)
                 {
                     interactObj.Interact();
                 }
@@ -35,6 +36,10 @@ public class Interactor : MonoBehaviour
             {
                 interactionText.text = "";
             }
+        }
+        else
+        {
+            interactionText.text = "";
         }
 
     }

@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
     public InputManager inputManager;
     private Transform cameraTransform;
 
+    public bool canMove = true;
+
     private void Start()
     {
         cameraTransform = Camera.main.transform;
@@ -24,13 +26,16 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        Vector2 movement = inputManager.GetPlayerMovement();
-        Vector3 move = new Vector3(movement.x, 0f, movement.y);
+        if (canMove)
+        {
+            Vector2 movement = inputManager.GetPlayerMovement();
+            Vector3 move = new Vector3(movement.x, 0f, movement.y);
 
-        move = cameraTransform.forward * move.z + cameraTransform.right * move.x;
-        move.y = 0f;
+            move = cameraTransform.forward * move.z + cameraTransform.right * move.x;
+            move.y = 0f;
 
-        rb.AddForce(move * speed * 10f, ForceMode.Force);
+            rb.AddForce(move * speed * 10f, ForceMode.Force);
+        }
     }
 
     private bool IsGrounded()

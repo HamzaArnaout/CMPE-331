@@ -22,31 +22,36 @@ public class BulletShoot : MonoBehaviour
     [SerializeField] ParticleSystem muzzleFlashParticle;
     [SerializeField] Light muzzleFlashLight;
 
+    public Interactor interactor;
+
     void Update()
     {
-        // If the player shoots, and has bullets in the magazine,
-        // we shoot, reduce 1 bullet, and update the text
-        if (inputManager.PlayerShotThisFrame() && bulletCount > 0)
+        if (interactor.canInteract)
         {
-            FireBullet();
-            bulletCount--;
-            UpdateBulletText();
-        }
+            // If the player shoots, and has bullets in the magazine,
+            // we shoot, reduce 1 bullet, and update the text
+            if (inputManager.PlayerShotThisFrame() && bulletCount > 0)
+            {
+                FireBullet();
+                bulletCount--;
+                UpdateBulletText();
+            }
 
-        // If the player reloads and has bullets in the inventory
-        // We do the math to check the bullets to remove from the inventory
-        // and the bullets to add to the magazine
-        if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0)
-        {
-            // Calculate how many bullets are needed to refill the magazine to full
-            int neededBullets = 12 - bulletCount;
-            // Determine how many bullets can be reloaded from the inventory
-            int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
-            // Decrease the inventory count by the number of bullets reloaded
-            bulletInventoryCount -= bulletsToReload;
-            // Increase the ready bullet count by the number of bullets reloaded
-            bulletCount += bulletsToReload;
-            UpdateBulletText();
+            // If the player reloads and has bullets in the inventory
+            // We do the math to check the bullets to remove from the inventory
+            // and the bullets to add to the magazine
+            if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0)
+            {
+                // Calculate how many bullets are needed to refill the magazine to full
+                int neededBullets = 12 - bulletCount;
+                // Determine how many bullets can be reloaded from the inventory
+                int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
+                // Decrease the inventory count by the number of bullets reloaded
+                bulletInventoryCount -= bulletsToReload;
+                // Increase the ready bullet count by the number of bullets reloaded
+                bulletCount += bulletsToReload;
+                UpdateBulletText();
+            }
         }
     }
 
