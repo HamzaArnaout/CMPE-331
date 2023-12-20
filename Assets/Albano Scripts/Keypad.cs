@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Keypad : MonoBehaviour
 {
     public GameObject player;
-    public GameObject camera;
+    public new GameObject camera;
     public GameObject keypadOB;
     public GameObject hud;
     

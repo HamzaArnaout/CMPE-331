@@ -19,8 +19,9 @@ public class FlashlightAdvanced : MonoBehaviour
     [SerializeField] private bool isFlashlightOn;
 
     [Header("Sound")]
-    [SerializeField] private AudioSource flashON;
-    [SerializeField] private AudioSource flashOFF;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip flashON;
+    [SerializeField] private AudioClip flashOFF;
 
     [Header("Controls")]
     public InputManager inputManager;
@@ -43,7 +44,7 @@ public class FlashlightAdvanced : MonoBehaviour
         // Turning on the flashlight
         if (inputManager.PlayerActivatedFlashlightThisFrame() && !isFlashlightOn && interactor.canInteract)
         {
-            //flashON.Play();
+            audioSource.PlayOneShot(flashON);
             light.enabled = true;
             isFlashlightOn = !isFlashlightOn;
         }
@@ -51,7 +52,7 @@ public class FlashlightAdvanced : MonoBehaviour
         // Turning off the flashlight
         else if (inputManager.PlayerActivatedFlashlightThisFrame() && isFlashlightOn && interactor.canInteract)
         {
-            //flashOFF.Play();
+            audioSource.PlayOneShot(flashOFF);
             light.enabled = false;
             isFlashlightOn = !isFlashlightOn;
         }

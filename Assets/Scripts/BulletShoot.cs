@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Rendering.HighDefinition;
 
 public class BulletShoot : MonoBehaviour
 {
-    // References to the bullet prefab and the firing point
-    public GameObject bulletPrefab;
     public Transform firePoint;
-    // Bullet speed
-    public float bulletSpeed = 1000f;
+    private float bulletRange = 1000f;
+    private bool canShoot = true;
 
     // Text element to display the bullet count
     public TextMeshProUGUI bulletText;
@@ -17,6 +16,7 @@ public class BulletShoot : MonoBehaviour
     [SerializeField] private int bulletCount = 12;
     // Total number of bullets available in the inventory
     [SerializeField] private int bulletInventoryCount = 48;
+    private bool reloading = false;
 
     [SerializeField] InputManager inputManager;
     [SerializeField] ParticleSystem muzzleFlashParticle;
@@ -24,15 +24,23 @@ public class BulletShoot : MonoBehaviour
 
     public Interactor interactor;
 
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip gunShotSFX;
+    [SerializeField] AudioClip gunReloadSFX;
+
+    Ray r;
+
     void Update()
     {
-        if (interactor.canInteract)
+        r = new Ray(firePoint.position, firePoint.forward); // Raycast from player to forward vector
+
+        if (interactor.canInteract && !reloading)
         {
             // If the player shoots, and has bullets in the magazine,
             // we shoot, reduce 1 bullet, and update the text
-            if (inputManager.PlayerShotThisFrame() && bulletCount > 0)
+            if (inputManager.PlayerShotThisFrame() && bulletCount > 0 && canShoot)
             {
-                FireBullet();
+                StartCoroutine(FireBullet());
                 bulletCount--;
                 UpdateBulletText();
             }
@@ -43,6 +51,7 @@ public class BulletShoot : MonoBehaviour
             if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0)
             {
                 // Calculate how many bullets are needed to refill the magazine to full
+                StartCoroutine(Reloading());
                 int neededBullets = 12 - bulletCount;
                 // Determine how many bullets can be reloaded from the inventory
                 int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
@@ -55,6 +64,14 @@ public class BulletShoot : MonoBehaviour
         }
     }
 
+    IEnumerator Reloading()
+    {
+        reloading = true;
+        audioSource.PlayOneShot(gunReloadSFX);
+        yield return new WaitForSeconds(2f);
+        reloading = false;
+    }
+
     // Updates the text display showing the number of bullets
     void UpdateBulletText()
     {
@@ -63,21 +80,32 @@ public class BulletShoot : MonoBehaviour
     }
 
     // Function to handle the firing of a bullet
-    void FireBullet()
+    IEnumerator FireBullet()
     {
-        // Create a bullet instance at the fire point's position and rotation
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        // Get the Rigidbody component for applying physics
-        Rigidbody rb = bullet.GetComponent<Rigidbody>();
-        if (rb != null)
+
+        if (Physics.Raycast(r, out RaycastHit hitInfo, bulletRange)) // Shoot raycast and get info
         {
-            // Apply a force to the bullet to propel it forward
-            rb.AddForce(firePoint.forward * bulletSpeed);
+            Debug.Log(hitInfo.collider.name);
+            if (hitInfo.collider.tag == "Zombie")
+            {
+                Debug.Log(hitInfo.collider.gameObject.GetComponentInParent<Health>().health);
+                hitInfo.collider.gameObject.GetComponentInParent<Health>().TakeDamage(10f);
+                Debug.Log("Shot");
+            }
+            else if (hitInfo.collider.tag == "ZombieHead")
+            {
+                hitInfo.collider.gameObject.GetComponentInParent<Health>().TakeDamage(100f);
+                Debug.Log("HEADSHOT!");
+            }
         }
+
         StartCoroutine(MuzzleFlashLight());
         muzzleFlashParticle.Play();
-        // Destroy the bullet after 5 seconds
-        Destroy(bullet, 5.0f);
+
+        audioSource.PlayOneShot(gunShotSFX);
+        canShoot = false;
+        yield return new WaitForSeconds(.25f);
+        canShoot = true;
     }
 
     IEnumerator MuzzleFlashLight()
@@ -85,5 +113,12 @@ public class BulletShoot : MonoBehaviour
         muzzleFlashLight.enabled = true;
         yield return new WaitForSeconds(0.1f);
         muzzleFlashLight.enabled = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Vector3 direction = firePoint.TransformDirection(Vector3.forward) * 1000;
+        Gizmos.DrawRay(firePoint.position, direction);
     }
 }
