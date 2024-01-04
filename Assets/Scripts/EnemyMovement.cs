@@ -30,6 +30,8 @@ public class EnemyMovement : MonoBehaviour
 
     public Health zombieHealth;
 
+    public GameObject colliders;
+
     private void Start()
     {
         player = GameObject.FindWithTag("Player");
@@ -89,6 +91,11 @@ public class EnemyMovement : MonoBehaviour
     public void SetHighSpeed()
     {
         speed = 1.5f;
+    }
+
+    public void DisableColliders()
+    {
+        colliders.SetActive(false);
     }
 
     private void OnDrawGizmosSelected()

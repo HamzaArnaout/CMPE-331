@@ -4,16 +4,21 @@ using UnityEngine;
 
 public class OpenKeyPad : MonoBehaviour, IInteractable
 {
-    public GameObject keypadOB;
+    public GameObject keypadUI;
     public InputManager inputManager;
+    public Keypad keypad;
 
     public void Interact()
     {
-        keypadOB.SetActive(true);
+        if(keypad.canBeInteractedWith)
+            keypadUI.SetActive(true);
     }
 
     public string SetInteractableText()
     {
-        return "Use (E) KeyPad";
+        if (keypad.canBeInteractedWith)
+            return "Use (E) KeyPad";
+        else
+            return "";
     }
 }

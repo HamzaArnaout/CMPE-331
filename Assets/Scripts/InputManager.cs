@@ -75,4 +75,9 @@ public class InputManager : MonoBehaviour
     {
         return playerControls.Player.Reload.triggered;
     }
+
+    public Vector2 PlayerScrolledThisFrame()
+    {
+        return playerControls.Player.Scroll.ReadValue<Vector2>();
+    }
 }

@@ -30,37 +30,50 @@ public class BulletShoot : MonoBehaviour
 
     Ray r;
 
+    public Animator animator;
+    public GameObject gun;
+    public GameObject gunUI;
+
     void Update()
     {
-        r = new Ray(firePoint.position, firePoint.forward); // Raycast from player to forward vector
-
-        if (interactor.canInteract && !reloading)
+        if (gun.activeInHierarchy)
         {
-            // If the player shoots, and has bullets in the magazine,
-            // we shoot, reduce 1 bullet, and update the text
-            if (inputManager.PlayerShotThisFrame() && bulletCount > 0 && canShoot)
-            {
-                StartCoroutine(FireBullet());
-                bulletCount--;
-                UpdateBulletText();
-            }
+            gunUI.SetActive(true);
 
-            // If the player reloads and has bullets in the inventory
-            // We do the math to check the bullets to remove from the inventory
-            // and the bullets to add to the magazine
-            if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0)
+            r = new Ray(firePoint.position, firePoint.forward); // Raycast from player to forward vector
+
+            if (interactor.canInteract && !reloading)
             {
-                // Calculate how many bullets are needed to refill the magazine to full
-                StartCoroutine(Reloading());
-                int neededBullets = 12 - bulletCount;
-                // Determine how many bullets can be reloaded from the inventory
-                int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
-                // Decrease the inventory count by the number of bullets reloaded
-                bulletInventoryCount -= bulletsToReload;
-                // Increase the ready bullet count by the number of bullets reloaded
-                bulletCount += bulletsToReload;
-                UpdateBulletText();
+                // If the player shoots, and has bullets in the magazine,
+                // we shoot, reduce 1 bullet, and update the text
+                if (inputManager.PlayerShotThisFrame() && bulletCount > 0 && canShoot)
+                {
+                    StartCoroutine(FireBullet());
+                    bulletCount--;
+                    UpdateBulletText();
+                }
+
+                // If the player reloads and has bullets in the inventory
+                // We do the math to check the bullets to remove from the inventory
+                // and the bullets to add to the magazine
+                if (inputManager.PlayerReloadedThisFrame() && bulletInventoryCount > 0 && bulletCount < 12)
+                {
+                    // Calculate how many bullets are needed to refill the magazine to full
+                    StartCoroutine(Reloading());
+                    int neededBullets = 12 - bulletCount;
+                    // Determine how many bullets can be reloaded from the inventory
+                    int bulletsToReload = Mathf.Min(neededBullets, bulletInventoryCount);
+                    // Decrease the inventory count by the number of bullets reloaded
+                    bulletInventoryCount -= bulletsToReload;
+                    // Increase the ready bullet count by the number of bullets reloaded
+                    bulletCount += bulletsToReload;
+                    UpdateBulletText();
+                }
             }
+        }
+        else
+        {
+            gunUI.SetActive(false);
         }
     }
 
@@ -101,6 +114,8 @@ public class BulletShoot : MonoBehaviour
 
         StartCoroutine(MuzzleFlashLight());
         muzzleFlashParticle.Play();
+
+        animator.SetTrigger("Recoil");
 
         audioSource.PlayOneShot(gunShotSFX);
         canShoot = false;

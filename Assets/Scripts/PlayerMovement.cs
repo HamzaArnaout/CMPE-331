@@ -31,10 +31,10 @@ public class PlayerMovement : MonoBehaviour
             Vector2 movement = inputManager.GetPlayerMovement();
             Vector3 move = new Vector3(movement.x, 0f, movement.y);
 
-            move = cameraTransform.forward * move.z + cameraTransform.right * move.x;
+            move = (cameraTransform.forward * move.z+ cameraTransform.right * move.x) * Time.deltaTime;
             move.y = 0f;
 
-            rb.AddForce(move * speed * 10f, ForceMode.Force);
+            rb.AddForce((move * 500f) * speed, ForceMode.Force);
         }
     }
 

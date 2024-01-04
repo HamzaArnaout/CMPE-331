@@ -6,7 +6,7 @@ using TMPro;
 
 public class FlashlightAdvanced : MonoBehaviour
 {
-    private new Light light;
+    public new Light light;
 
     [Header("UI elements")]
     public TMP_Text lifetimeText;
@@ -27,65 +27,72 @@ public class FlashlightAdvanced : MonoBehaviour
     public InputManager inputManager;
     public Interactor interactor;
 
-
-    void Start()
-    {
-        light = GetComponent<Light>();
-    }
+    [Header("Other")]
+    public GameObject flashlight;
+    public GameObject flashlightUI;
 
     void Update()
     {
-        // Update the text for lifetime and battery amount respectively
-        lifetimeText.text = lifetime.ToString("0") + "%";
-        batteriesAmountText.text = batteriesAmount.ToString();
-        lifetimeImageHandling();
-
-
-        // Turning on the flashlight
-        if (inputManager.PlayerActivatedFlashlightThisFrame() && !isFlashlightOn && interactor.canInteract)
+        if (flashlight.activeInHierarchy)
         {
-            audioSource.PlayOneShot(flashON);
-            light.enabled = true;
-            isFlashlightOn = !isFlashlightOn;
+            flashlightUI.SetActive(true);
+
+            // Update the text for lifetime and battery amount respectively
+            lifetimeText.text = lifetime.ToString("0") + "%";
+            batteriesAmountText.text = batteriesAmount.ToString();
+            lifetimeImageHandling();
+
+
+            // Turning on the flashlight
+            if (inputManager.PlayerActivatedFlashlightThisFrame() && !isFlashlightOn && interactor.canInteract)
+            {
+                audioSource.PlayOneShot(flashON);
+                light.enabled = true;
+                isFlashlightOn = !isFlashlightOn;
+            }
+
+            // Turning off the flashlight
+            else if (inputManager.PlayerActivatedFlashlightThisFrame() && isFlashlightOn && interactor.canInteract)
+            {
+                audioSource.PlayOneShot(flashOFF);
+                light.enabled = false;
+                isFlashlightOn = !isFlashlightOn;
+            }
+
+            // As long as the flashlight is turned on
+            // lifetime reduces by 2 each second
+            if (isFlashlightOn && lifetime > 0)
+            {
+                lifetime -= 2 * Time.deltaTime;
+            }
+
+            // Cap lifetime from ever going less than 0
+            // and shutting off the flashlight if the
+            // lifetime is equal to less than 0.5
+            if (lifetime < 0.5)
+            {
+                light.enabled = false;
+                isFlashlightOn = false;
+                lifetime = 0;
+            }
+
+            // Cap lifetime from ever going over 100
+            if (lifetime >= 100)
+            {
+                lifetime = 100;
+            }
+
+            // Reloading batteries makes adds 50 to the lifetime
+            // and it deducts 1 battery from the inventory
+            if (inputManager.PlayerReloadedThisFrame() && batteriesAmount >= 1 && interactor.canInteract)
+            {
+                batteriesAmount -= 1;
+                lifetime += 100;
+            }
         }
-
-        // Turning off the flashlight
-        else if (inputManager.PlayerActivatedFlashlightThisFrame() && isFlashlightOn && interactor.canInteract)
+        else
         {
-            audioSource.PlayOneShot(flashOFF);
-            light.enabled = false;
-            isFlashlightOn = !isFlashlightOn;
-        }
-
-        // As long as the flashlight is turned on
-        // lifetime reduces by 2 each second
-        if (isFlashlightOn && lifetime > 0)
-        {
-            lifetime -= 2 * Time.deltaTime;
-        }
-
-        // Cap lifetime from ever going less than 0
-        // and shutting off the flashlight if the
-        // lifetime is equal to less than 0.5
-        if(lifetime < 0.5)
-        {
-            light.enabled = false;
-            isFlashlightOn = false;
-            lifetime = 0;
-        }
-
-        // Cap lifetime from ever going over 100
-        if (lifetime >= 100)
-        {
-            lifetime = 100;
-        }
-
-        // Reloading batteries makes adds 50 to the lifetime
-        // and it deducts 1 battery from the inventory
-        if (inputManager.PlayerReloadedThisFrame() && batteriesAmount >= 1 && interactor.canInteract)
-        {
-            batteriesAmount -= 1;
-            lifetime += 100;
+            flashlightUI.SetActive(false);
         }
     }
 
